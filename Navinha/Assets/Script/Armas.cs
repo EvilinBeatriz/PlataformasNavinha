@@ -1,83 +1,95 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class Armas : MonoBehaviour
 {
-    [Header("Configurações de Disparo")]
-    public GameObject bulletPrefab;
     public GameObject[] weaponPrefabs;
     public Transform firePoint;
     public float fireRate = 5f;
-    public Foguete foguete;
+    public int missileAmmo = 5;
+    public int maxMissileAmmo = 10;
+
     private int currentWeaponIndex = 0;
     private float nextFireTime = 0f;
-    public GameObject fogueteobj;
+
     void Start()
     {
-        if (weaponPrefabs.Length == 0)
+        if (weaponPrefabs.Length < 2)
         {
-            Debug.LogError("O Arsenal está vazio. Adicione os prefabs de tiro.");
             enabled = false;
         }
-        if (firePoint == null)
-        {
-            Debug.LogError("Fire Point não configurado.");
-        }
-
-        Debug.Log($"Arma inicial: {currentWeaponIndex}");
     }
+
     public void Shoot()
     {
         if (Time.time >= nextFireTime)
         {
             nextFireTime = Time.time + 1f / fireRate;
 
-            // Pega o prefab ativo da lista
-            GameObject activePrefab = weaponPrefabs[currentWeaponIndex];
-
-            // Instancia o projétil
-            GameObject projectile = Instantiate(activePrefab, firePoint.position, firePoint.rotation);
-
-            // Se for o foguete, precisamos atribuir o alvo
-            if (currentWeaponIndex == 1) // Assumindo que o Foguete é o índice 1
+            if (currentWeaponIndex == 0)
             {
-                foguete = projectile.GetComponent<Foguete>();
-                if (foguete != null)
-                {
-                    // Tenta encontrar o alvo (função auxiliar precisa existir)
-                    Transform target = FindNearestEnemy();
-                    foguete.target = target;
-                    if (target == null) Debug.Log("Foguete disparado sem alvo!");
-                }
+                FireBasicShot();
             }
-
+            else if (currentWeaponIndex == 1)
+            {
+                FireHomingMissile();
+            }
         }
     }
+
+    public void ChangeWeaponType()
+    {
+        currentWeaponIndex = (currentWeaponIndex + 1) % weaponPrefabs.Length;
+    }
+
+    public void CollectMissileAmmo(int amount)
+    {
+        missileAmmo += amount;
+        missileAmmo = Mathf.Min(missileAmmo, maxMissileAmmo);
+    }
+
+    public void UseSpecialAbility()
+    {
+
+    }
+
+    private void FireBasicShot()
+    {
+        GameObject basicPrefab = weaponPrefabs[0];
+        Instantiate(basicPrefab, firePoint.position, firePoint.rotation);
+    }
+
+    public void FireHomingMissile()
+    {
+        if (missileAmmo <= 0)
+        {
+            FireBasicShot();
+            return;
+        }
+
+        Transform target = FindNearestEnemy();
+
+        if (target != null)
+        {
+            GameObject missilePrefab = weaponPrefabs[1];
+            GameObject projectile = Instantiate(missilePrefab, firePoint.position, firePoint.rotation);
+
+            Foguete missile = projectile.GetComponent<Foguete>();
+            if (missile != null)
+            {
+                missile.target = target;
+            }
+
+            missileAmmo--;
+        }
+    }
+
     private Transform FindNearestEnemy()
     {
-        // Lógica simplificada de busca de alvo
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
         if (enemies.Length > 0)
         {
             return enemies[0].transform;
         }
         return null;
-    }
-
-    public void ChangeWeaponType()
-    {
-        Debug.Log("Arma trocada.");
-    }
-    public void UseSpecialAbility()
-    {
-        Debug.Log("Habilidade especial ativada.");
-    }
-    public void FireHomingMissile(Transform targetToLock)
-    {
-        GameObject missileGO = Instantiate(fogueteobj, firePoint.position, firePoint.rotation);
-        foguete = missileGO.GetComponent<Foguete>();
-        if (foguete != null)
-        {
-            foguete.target = targetToLock;
-        }
     }
 }

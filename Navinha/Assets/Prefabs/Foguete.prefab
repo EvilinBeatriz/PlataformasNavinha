@@ -102,6 +102,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2509b328b4bd05445b23bd9ec6b335ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  forwardSpeed: 15
+  turnSpeed: 200
+  damage: 10
+  lifeTime: 5
 --- !u!50 &1821559122505659653
 Rigidbody2D:
   serializedVersion: 5
@@ -159,7 +164,7 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
