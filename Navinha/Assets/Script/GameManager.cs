@@ -12,6 +12,9 @@ public class GameManager : MonoBehaviour
     public float maxPlayerHealth = 100f;
 
     private bool isGameOver = false;
+    public EventChannelSO hudChannel;
+    public int score = 0;
+
 
     private void Awake()
     {
